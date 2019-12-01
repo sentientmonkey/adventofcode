@@ -36,5 +36,5 @@ if __FILE__ == $0
   input = ARGF.read.chomp
   masses = input.split(/\s+/).map(&:to_i)
   puts RocketCalc.total_fuel masses
-  puts RocketCalc.total_extra masses
+  puts RocketCalc.total_fuel_extra masses
 end
