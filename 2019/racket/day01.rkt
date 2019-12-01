@@ -16,18 +16,16 @@
   (for/sum ([mass masses])
     (fuel mass)))
 
-(define (fuel-sums-helper mass lst)
-  (if (< mass 0)
-    (cdr lst)
-    (let ([curr (fuel mass)])
-      (fuel-sums-helper curr (cons curr lst)))))
-
 (define (fuel-sums mass)
-  (fuel-sums-helper mass '()))
-
+  (let loop ([mass mass] [lst '()])
+    (let ([curr (fuel mass)])
+      (if (< curr 0)
+        lst
+        (loop curr (cons curr lst))))))
 
 (define (fuel-extra mass)
-  (for/sum ([sum (fuel-sums mass)]) sum))
+  (for/sum ([sum (fuel-sums mass)])
+    sum))
 
 (define (fuel-total-extra masses)
   (for/sum ([mass masses])
