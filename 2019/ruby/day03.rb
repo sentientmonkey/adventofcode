@@ -3,10 +3,20 @@
 class Panel
   def self.trace route
     wire_a, wire_b = route.split "\n"
-    trace_a = path(wire_a)
-    trace_b = path(wire_b)
-    filtered = crosses(trace_a,trace_b)
-    minimum_distance(filtered)
+    trace_a = path wire_a
+    trace_b = path wire_b
+    filtered = trace_a & trace_b
+    minimum_distance filtered
+  end
+
+  def self.trace_steps route
+    wire_a, wire_b = route.split "\n"
+    trace_a = path wire_a
+    trace_b = path wire_b
+    crosses = trace_a & trace_b
+    crosses.sort_by {|x| x[0].abs + x[1].abs }
+      .map {|x| trace_a.index(x) + trace_b.index(x) + 2}
+      .min
   end
 
   def self.path wire
@@ -61,4 +71,5 @@ end
 if __FILE__ == $0
   input = ARGF.read.chomp
   puts Panel.trace input
+  puts Panel.trace_steps input
 end
