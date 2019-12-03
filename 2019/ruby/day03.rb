@@ -5,8 +5,9 @@ class Panel
     wire_a, wire_b = route.split "\n"
     trace_a = path wire_a
     trace_b = path wire_b
-    filtered = trace_a & trace_b
-    minimum_distance filtered
+    crosses = trace_a & trace_b
+    crosses.map {|x| x[0].abs + x[1].abs }
+      .min
   end
 
   def self.trace_steps route
@@ -54,17 +55,6 @@ class Panel
     else
       raise "wut"
     end
-  end
-
-  def self.crosses a, b
-    a & b
-  end
-
-  def self.minimum_distance crosses
-    crosses.map do |cross|
-      a,b = cross
-      a.abs + b.abs
-    end.min
   end
 end
 
