@@ -3,9 +3,13 @@
 class PasswordCracker
   def self.valid? password
     chars = password.to_s.chars
+    pairs = chars.each_cons(2).to_a
     chars.size == 6 &&
-     chars.uniq.size != 6 &&
-     chars.each_cons(2).all?{|p| p[0] <= p[1] }
+     pairs.all?{|p| p[0] <= p[1] } &&
+     pairs.any? do |a| 
+       a == a.reverse &&
+         pairs.select{|b| a == b}.size == 1 
+     end
   end
 
   def self.guesses b, e 

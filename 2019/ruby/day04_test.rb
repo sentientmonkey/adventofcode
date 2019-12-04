@@ -12,7 +12,7 @@ class PasswordCrackerTest < Minitest::Test
   end
 
   def test_passwords_are_six_digits
-    assert @subject.valid? 111111
+    assert @subject.valid? 112345
     refute @subject.valid? 11111
   end
 
@@ -22,11 +22,17 @@ class PasswordCrackerTest < Minitest::Test
   end
 
   def test_password_dont_increase
-    assert @subject.valid? 111123
+    assert @subject.valid? 112345
     refute @subject.valid? 223450
   end
 
   def test_returns_passwords_within_range
-    assert_equal 9, @subject.guesses(111111, 111120).size
+    assert_equal 1, @subject.guesses(112290, 112300).size
+  end
+
+  def test_two_adjacent_chars
+    assert @subject.valid? 112233
+    refute @subject.valid? 123444
+    assert @subject.valid? 111122
   end
 end
