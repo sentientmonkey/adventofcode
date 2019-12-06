@@ -22,6 +22,12 @@ class ComputerTest < Minitest::Test
     assert_equal expected, r[1]
   end
 
+  def assert_input expected, source, input
+    program = @subject.compile source
+    r = @subject.run program, input
+    assert_equal expected, r[0]
+  end
+
   def test_intcode_adds
     assert_program [1,0,0,2,99], "1,0,0,3,99"
   end
@@ -35,12 +41,12 @@ class ComputerTest < Minitest::Test
   end
 
   def test_intcode_stores
-    assert_program [1,1,0,99], "3,1,0,99"
+    assert_input [1,0,99], "3,0,99", 1
   end
 
   def test_intcode_outputs
     assert_program [4,2,99], "4,2,99"
-    assert_output "99", "4,2,99"
+    assert_output [99], "4,2,99"
   end
 
   def test_position_arguments

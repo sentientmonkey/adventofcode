@@ -7,45 +7,52 @@ class Computer
   PRINT = 4
   HALT  = 99
 
-  def self.run stack
+  def self.run stack, initial_input=nil
     pc = 0
-    output = ""
+    output = []
+    input = []
+    if initial_input
+      input << initial_input
+    end
+    trace = ENV["TRACE"]
     loop do
       raise "catch fire" if pc >= stack.size
+      if trace
+        debug "PC", pc
+        debug "Stack", stack
+        debug "input", input
+        debug "output", output
+      end
       opcode = stack[pc]
       pc+=1
       case opcode % 100
       when ADD
-        arg = stack[pc...(pc+2)]
+        arg = stack[pc,2]
         p = params opcode, arg, stack
         stack[stack[pc+2]] = p[0] + p[1]
         pc+=3
       when MULT
-        arg = stack[pc...(pc+2)]
+        arg = stack[pc,2]
         p = params opcode, arg, stack
         stack[stack[pc+2]] = p[0] * p[1]
         pc+=3
       when STORE
-        arg = stack[pc...(pc+1)]
-        p = params opcode, arg, stack
-        stack[stack[pc+1]] = p[0]
-        pc+=2
+        stack[stack[pc]] = input.shift
+        pc+=1
       when PRINT
-        arg = stack[pc...(pc+1)]
+        arg = stack[pc,1]
         p = params opcode, arg, stack
-        output << p[0].to_s
+        output << p[0]
         pc+=1
       when HALT
         break
       else
-        raise "unknown opcode: #{opcode}\n#{stack}\n#{pc}"
+        debug "PC", pc
+        debug "Stack", stack
+        raise "unknown opcode: #{opcode}"
       end
     end
     [stack,output]
-  end
-
-  def self.instruction pos, stack, pc, param_count
-    stack[(pc)...(pc+param_count)]
   end
 
   def self.params opcode, ins, stack
@@ -65,6 +72,10 @@ class Computer
       .map(&:to_i)
   end
 
+  def self.debug desc, value 
+    puts "#{desc}: #{value}"
+  end
+
   def self.alter_program program, noun, verb
     altered = program.dup
     altered[1] = noun
@@ -76,6 +87,6 @@ end
 if __FILE__ == $0
   input = ARGF.read.chomp
   program = Computer.compile input
-  stack,output = Computer.run program
+  _,output = Computer.run program, 1
   puts output
 end
