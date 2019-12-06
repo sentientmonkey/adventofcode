@@ -5,6 +5,10 @@ class Computer
   MULT  = 2 
   STORE = 3
   PRINT = 4
+  JMPT  = 5
+  JMPF  = 6
+  LESS  = 7
+  EQL   = 8
   HALT  = 99
 
   def self.run stack, initial_input=nil
@@ -36,6 +40,24 @@ class Computer
         p = params opcode, arg, stack
         stack[stack[pc+2]] = p[0] * p[1]
         pc+=3
+      when EQL
+        arg = stack[pc,2]
+        p = params opcode, arg, stack
+        stack[stack[pc+2]] = p[0] == p[1] ? 1 : 0
+        pc+=3
+      when LESS
+        arg = stack[pc,2]
+        p = params opcode, arg, stack
+        stack[stack[pc+2]] = p[0] < p[1] ? 1 : 0
+        pc+=3
+      when JMPF
+        arg = stack[pc,2]
+        p = params opcode, arg, stack
+        if p[0].zero?
+          pc = p[1]
+        else
+          pc+=3
+        end
       when STORE
         stack[stack[pc]] = input.shift
         pc+=1
