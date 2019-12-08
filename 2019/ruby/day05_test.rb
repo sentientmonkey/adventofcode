@@ -95,12 +95,26 @@ class ComputerTest < Minitest::Test
     assert_io 0, less_than, 8 
   end
 
-  def test_jump_position
+  def test_jump_if_position
     is_nonzero = "3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9"
     assert_io 1, is_nonzero, 1
     assert_io 0, is_nonzero, 0
   end
 
+  def test_jump_if_immediate
+    is_nonzero = "3,3,1105,-1,9,1101,0,0,12,4,12,99,1" 
+    assert_io 1, is_nonzero, 1
+    assert_io 0, is_nonzero, 0
+  end
+  
+  def test_full_with_jumps
+    is_eight = "3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99"
+
+    assert_io 999, is_eight, 7
+    assert_io 1000, is_eight, 8
+    assert_io 1001, is_eight, 9
+  end
+ 
   def test_alter_program
     altered = @subject.alter_program [1,0,0,2,99], 12, 2
     assert_equal [1,12,2,2,99], altered

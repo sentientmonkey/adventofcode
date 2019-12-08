@@ -56,7 +56,15 @@ class Computer
         if p[0].zero?
           pc = p[1]
         else
-          pc+=3
+          pc+=2
+        end
+      when JMPT
+        arg = stack[pc,2]
+        p = params opcode, arg, stack
+        if !p[0].zero?
+          pc = p[1]
+        else
+          pc+=2
         end
       when STORE
         stack[stack[pc]] = input.shift
@@ -110,5 +118,9 @@ if __FILE__ == $0
   input = ARGF.read.chomp
   program = Computer.compile input
   _,output = Computer.run program, 1
+  puts output
+
+  program = Computer.compile input
+  _,output = Computer.run program, 5
   puts output
 end
