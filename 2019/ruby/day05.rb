@@ -1,99 +1,133 @@
 #!/usr/bin/env ruby -w
 
-class Computer
-  ADD   = 1
-  MULT  = 2 
-  STORE = 3
-  PRINT = 4
-  JMPT  = 5
-  JMPF  = 6
-  LESS  = 7
-  EQL   = 8
-  HALT  = 99
+ADD   = 1
+MULT  = 2 
+WRITE = 3
+READ  = 4
+JMPT  = 5
+JMPF  = 6
+LESS  = 7
+EQL   = 8
+HALT  = 99
 
-  def self.run stack, initial_input=nil
-    pc = 0
-    output = []
-    input = []
+class State
+  attr_accessor :mem, :pc, :input, :output
+
+  def initialize mem, initial_input=nil
+    @mem = mem
+    @pc = 0
+    @input = []
     if initial_input
-      input << initial_input
+      @input << initial_input
     end
-    trace = ENV["TRACE"]
-    loop do
-      raise "catch fire" if pc >= stack.size
-      if trace
-        debug "PC", pc
-        debug "Stack", stack
-        debug "input", input
-        debug "output", output
-      end
-      opcode = stack[pc]
-      pc+=1
-      case opcode % 100
-      when ADD
-        arg = stack[pc,2]
-        p = params opcode, arg, stack
-        stack[stack[pc+2]] = p[0] + p[1]
-        pc+=3
-      when MULT
-        arg = stack[pc,2]
-        p = params opcode, arg, stack
-        stack[stack[pc+2]] = p[0] * p[1]
-        pc+=3
-      when EQL
-        arg = stack[pc,2]
-        p = params opcode, arg, stack
-        stack[stack[pc+2]] = p[0] == p[1] ? 1 : 0
-        pc+=3
-      when LESS
-        arg = stack[pc,2]
-        p = params opcode, arg, stack
-        stack[stack[pc+2]] = p[0] < p[1] ? 1 : 0
-        pc+=3
-      when JMPF
-        arg = stack[pc,2]
-        p = params opcode, arg, stack
-        if p[0].zero?
-          pc = p[1]
-        else
-          pc+=2
-        end
-      when JMPT
-        arg = stack[pc,2]
-        p = params opcode, arg, stack
-        if !p[0].zero?
-          pc = p[1]
-        else
-          pc+=2
-        end
-      when STORE
-        stack[stack[pc]] = input.shift
-        pc+=1
-      when PRINT
-        arg = stack[pc,1]
-        p = params opcode, arg, stack
-        output << p[0]
-        pc+=1
-      when HALT
-        break
-      else
-        debug "PC", pc
-        debug "Stack", stack
-        raise "unknown opcode: #{opcode}"
-      end
-    end
-    [stack,output]
+    @output = []
   end
 
-  def self.params opcode, ins, stack
+  def [](loc)
+    @mem[loc]
+  end
+
+  def []=(loc, val)
+    @mem[loc] = val
+  end
+
+  def past_memory?
+    @pc >= @mem.size
+  end
+
+  def advance steps=1
+    @pc += steps
+  end
+
+  def jump loc
+    @pc = loc
+  end
+
+  def next 
+    opcode = @mem[@pc]
+    num_args = arg_count opcode
+    r = params opcode, @mem[@pc+1,num_args]
+    [opcode] + r
+  end
+
+  def fetch_input
+    @input.shift
+  end
+
+  def write_output value
+    @output << value
+  end
+
+  private
+
+  def params opcode, ins
     ins.each_with_index.map do |param,i|
       div = 10**(i+2)
       if ((opcode / div) % 2) == 1 || i >= 3
         param
       else
-        stack[param]
+        @mem[param]
       end
     end
+  end
+
+  def arg_count opcode
+    case opcode % 100
+    when ADD, MULT, EQL, LESS then 3
+    when JMPT, JMPF then 2
+    when READ, WRITE, LESS then 1
+    when HALT then 1
+    else raise "unknown opcode #{opcode}"
+    end
+  end
+end
+
+class Computer
+  def self.run stack, initial_input=nil
+    state = State.new stack, initial_input
+    trace = ENV["TRACE"]
+    loop do
+      raise "catch fire" if state.past_memory? 
+      if trace
+        puts state.inspect
+      end
+      p = state.next
+      opcode = p.first
+      state.advance
+      case opcode % 100
+      when ADD
+        puts p.inspect
+        puts p[3]
+        state[state[state.pc+2]] = p[1] + p[2]
+      when MULT
+        state[state[state.pc+2]] = p[1] * p[2]
+      when EQL
+        state[state[state.pc+2]] = p[1] == p[2] ? 1 : 0
+      when LESS
+        state[state[state.pc+2]] = p[1] < p[2] ? 1 : 0
+      when JMPF
+        if p[1].zero?
+          state.jump p[2]
+          next
+        end
+      when JMPT
+        if !p[1].zero?
+          state.jump p[2]
+          next
+        end
+      when WRITE
+        state[state[state.pc]] = state.fetch_input
+      when READ
+        state.write_output p[1]
+      when HALT
+        break
+      else
+        puts state.inspect
+        raise "unknown opcode: #{opcode}"
+      end
+      state.advance p.size-1
+    end
+    [state.mem,state.output]
   end
 
   def self.compile program
