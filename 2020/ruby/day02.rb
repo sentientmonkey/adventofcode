@@ -10,21 +10,25 @@ class TheLastPass
 
   def min_max_count
     @entries.select do |entry|
-      count = entry[:password].count(entry[:char])
-      max = entry[:to].to_i 
-      min = entry[:from].to_i 
-      count <= max && count >= min
+      password, char, to, from = entry.values_at(
+        :password, :char, :to, :from
+      )
+      count = password.count(char)
+      count <= to.to_i && count >= from.to_i
     end.size
   end
 
   def index_count
     @entries.select do |entry|
-      contain = entry[:from].to_i 
-      not_contain = entry[:to].to_i 
+      password, char, to, from = entry.values_at(
+        :password, :char, :to, :from
+      )
+      contain = from.to_i - 1
+      not_contain = to.to_i - 1
 
-      [entry[:password][contain-1],
-       entry[:password][not_contain-1]]
-        .count(entry[:char]) == 1
+      [password[contain],
+       password[not_contain]]
+        .count(char) == 1
     end.size
   end
 end
