@@ -59,4 +59,17 @@ class TobogganTest < Minitest::Test
   def test_togobban_trees
     assert_equal 7, @toboggan.tree_count
   end
+
+  def test_togobban_paths
+    assert_equal 2, @toboggan.tree_count(1, 1)
+    assert_equal 7, @toboggan.tree_count(3, 1)
+    assert_equal 3, @toboggan.tree_count(5, 1)
+    assert_equal 4, @toboggan.tree_count(7, 1)
+    assert_equal 2, @toboggan.tree_count(1, 2)
+  end
+
+  def test_togobban_path_product
+    assert_equal 336, @toboggan.path_product
+  end
+
 end
