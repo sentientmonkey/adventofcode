@@ -39,13 +39,12 @@ def search input, up, down, from, to
   raise "input empty" if input.empty?
 
   mid = ((to-from)/2.0)
-  first = input[0,1]
-  rest = input[1..]
+  first, *rest = input.split ''
   case first
   when up
-    search rest, up, down, from, from+mid.floor
+    search rest.join(''), up, down, from, from+mid.floor
   when down
-    search rest, up, down, from+mid.ceil, to
+    search rest.join(''), up, down, from+mid.ceil, to
   else
     raise "#{first} not valid"
   end
