@@ -1,9 +1,20 @@
 #!/usr/bin/env ruby -w
 
-def seat_max input
+def missing_seat input
+  seats(input).sort.each_cons(2) do |a,b|
+    if a.succ != b
+      return a.succ
+    end
+  end
+end
+
+def seats input
   input.split(/\s+/)
     .map { |i| seat i }
-    .max
+end
+
+def seat_max input
+  seats(input).max
 end
 
 def seat input
@@ -43,5 +54,5 @@ end
 
 if __FILE__ == $0
   input = ARGF.read.chomp
-  puts seat_max(input)
+  puts missing_seat input
 end
