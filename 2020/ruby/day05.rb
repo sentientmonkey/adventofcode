@@ -39,7 +39,7 @@ def search input, up, down, from, to
   raise "input empty" if input.empty?
 
   mid = (to-from)/2.0
-  first, rest = [input.chars.first, input.chars.drop(1).join('')]
+  first, rest = input[0], input[1..]
   case first
   when up
     search rest, up, down, from, from+mid.floor
