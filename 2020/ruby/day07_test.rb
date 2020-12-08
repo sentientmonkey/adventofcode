@@ -18,9 +18,14 @@ class TestHandyHaversack < Minitest::Test
     EOS
   end
 
-  def test_bags
+  def test_holds_shiny
     rows = hold_shiny @input
     assert_equal(4, rows)
+  end
+
+  def test_shiny_holds
+    rows = shiny_holds @input
+    assert_equal(32, rows)
   end
 end
  
