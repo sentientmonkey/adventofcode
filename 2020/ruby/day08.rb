@@ -1,5 +1,57 @@
 #!/usr/bin/env ruby -w
 
+class GameboyDebugger
+  attr_reader :patch_pos
+
+  def initialize input
+    @input = input
+    @patch_pos = 0
+  end
+
+  def acc
+    @gb.acc
+  end
+
+  def run
+    reset!
+    while @patch_pos <= @input.size
+      case getop
+      when :jmp
+        patch @patch_pos, :nop
+      when :nop
+        patch @patch_pos, :jmp
+      when :acc
+        adv_pos
+        next
+      end
+      break if halt?
+      adv_pos
+    end
+  end
+
+  def adv_pos
+    @patch_pos = @patch_pos.succ
+  end
+
+  def patch pos, op
+    reset!
+    @gb.stack[pos][0] = op
+    @gb.run
+  end
+
+  def getop
+    @gb.stack[@patch_pos][0]
+  end
+
+  def halt?
+    @gb.halt?
+  end
+
+  def reset!
+    @gb = Gameboy.new @input
+  end
+end
+
 class Gameboy
   attr_reader :stack, :acc, :pos, :pc
 
@@ -7,6 +59,7 @@ class Gameboy
     @stack = parse input
     @acc = 0
     @pos = 0
+    @exit = 0
     @debug = debug
     @trace = Array.new(@stack.size)
   end
@@ -29,7 +82,10 @@ class Gameboy
 
   def run
     while @pos < @stack.size
-      break if infinite_loop?
+      if infinite_loop?
+        @exit = 1
+        break
+      end
       case op
       when :nop
         trace
@@ -45,6 +101,10 @@ class Gameboy
         raise "Invalid instruction #{ins}"
       end
     end
+  end
+
+  def halt?
+    @exit == 0
   end
 
   def infinite_loop?
@@ -64,7 +124,8 @@ class Gameboy
 end
 
 if __FILE__ == $0
-  gb = Gameboy.new(ARGF.read.chomp)
-  gb.run
-  puts gb.acc
+  input = ARGF.read.chomp
+  gbd = GameboyDebugger.new(input)
+  gbd.run
+  puts gbd.acc
 end

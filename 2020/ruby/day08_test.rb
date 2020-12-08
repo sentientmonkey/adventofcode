@@ -38,16 +38,35 @@ class TestGameboy < Minitest::Test
   end
 
   def test_jmp_skips
-    gb = Gameboy.new "jmp +1\nacc +4"
+    gb = Gameboy.new "jmp +2\nacc +4"
     gb.run
     assert_equal gb.acc, 0
     assert_equal gb.pos, 2
   end
 
-  def test_stops
+  def test_stops_in_infite_loop
     gb = Gameboy.new @program
     gb.run
     assert_equal gb.acc, 5
   end
+
+  def test_does_not_halt
+    gb = Gameboy.new @program
+    gb.run
+    refute gb.halt?
+  end
+
+  def test_gameboy_debugger_patch
+    gbd = GameboyDebugger.new @program
+    gbd.patch 7,:nop
+    assert gbd.halt?
+    assert_equal 8, gbd.acc
+  end
+
+  def test_gameboy_debugger_find_patch
+    gbd = GameboyDebugger.new @program
+    gbd.run
+    assert_equal 8, gbd.acc
+    assert_equal 7, gbd.patch_pos
+  end
 end
- 
