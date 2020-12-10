@@ -49,6 +49,10 @@ class TestDay < Minitest::Test
     assert_equal 35, @joltage.product
   end
 
+  def test_arrangements
+    assert_equal 8, @joltage.arrangments
+  end
+
   def test_larger
     input = <<~EOS
     28
@@ -86,5 +90,6 @@ class TestDay < Minitest::Test
 
     joltage = JoltageAdapter.new input
     assert_equal 220, joltage.product
+    assert_equal 19208, joltage.arrangments
   end
 end

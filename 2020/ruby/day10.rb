@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby -w
 
+def fact(n); n == 0 ? 1 : n * fact(n-1); end
+
 class JoltageAdapter
   def initialize input
     @ratings = input.split(/\s+/).map(&:to_i)
@@ -26,9 +28,18 @@ class JoltageAdapter
   def product
     tally.values_at(1, 3).reduce(&:*)
   end
+
+  def arrangments
+    diffs.slice_when{ |a,b| a != b }
+      .select{ |xs| xs.first == 1 }
+      .map{ |xs| 2**(xs.size-1) }
+      .reduce(&:*)
+  end
 end
 
 if __FILE__ == $0
   input = ARGF.read.chomp
-  puts JoltageAdapter.new(input).product
+  j = JoltageAdapter.new(input)
+  puts j.product
+  puts j.arrangments
 end
