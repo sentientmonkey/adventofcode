@@ -18,11 +18,19 @@ class DeXMAS
   end
 
   def max_product
+    sum = weakness
+    (2...@numbers.size).each do |size|
+      @numbers.each_cons(size) do |nums|
+        if nums.sum == sum
+          return nums.minmax.sum
+        end
+      end
+    end
   end
 end
 
 if __FILE__ == $0
   input = ARGF.read.chomp
   d =  DeXMAS.new(preamble: 25, input: input)
-  puts d.weakness
+  puts d.max_product
 end

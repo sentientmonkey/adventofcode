@@ -4,32 +4,8 @@ require "minitest/pride"
 require_relative "day09.rb"
 
 class TestDeXMAS < Minitest::Test
-
-  def weakness range, next_number
-    preamble = range.to_a.concat([next_number])
-    puts preamble.inspect
-    input = preamble.join("\n")
-    d = DeXMAS.new preamble: preamble.size-1, input: input
-    d.weakness
-  end
-
-  def assert_weakness range, next_number
-    assert_equal weakness(range, next_number), next_number
-  end
-
-  def refute_weakness range, next_number
-    refute weakness(range, next_number)
-  end
-
-  def test_weakness_25
-    refute_weakness(1..25, 26)
-    refute_weakness(1..25, 49)
-    assert_weakness(1..25, 100)
-    assert_weakness(1..25, 50)
-  end
-
-  def test_weakness
-    input = <<~EOS
+  def setup
+    @input = <<~EOS
     35
     20
     15
@@ -51,8 +27,37 @@ class TestDeXMAS < Minitest::Test
     309
     576
     EOS
+  end
 
-    d = DeXMAS.new preamble:5, input: input
+  def weakness range, next_number
+    preamble = range.to_a.concat([next_number])
+    input = preamble.join("\n")
+    d = DeXMAS.new preamble: preamble.size-1, input: input
+    d.weakness
+  end
+
+  def assert_weakness range, next_number
+    assert_equal weakness(range, next_number), next_number
+  end
+
+  def refute_weakness range, next_number
+    refute weakness(range, next_number)
+  end
+
+  def test_weakness_25
+    refute_weakness(1..25, 26)
+    refute_weakness(1..25, 49)
+    assert_weakness(1..25, 100)
+    assert_weakness(1..25, 50)
+  end
+
+  def test_weakness
+    d = DeXMAS.new preamble:5, input: @input
     assert_equal 127, d.weakness
+  end
+
+  def test_max_product
+    d = DeXMAS.new preamble:5, input: @input
+    assert_equal 62, d.max_product
   end
 end
