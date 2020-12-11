@@ -14,14 +14,37 @@ class GameOfButts
     @state = input.split("\n").map(&:chars)
   end
 
+  def size
+    @state.size
+  end
+
   def ajacent? i, j, value
-    size = @state.size
     NEIGHBORS.count do |di,dj| 
        ii,jj = di+i,dj+j
        ii.between?(0, size-1) && 
          jj.between?(0, size-1) &&
          @state[ii][jj] == value
      end
+  end
+
+  def can_see i, j, di, dj
+    ii = di+i
+    jj = dj+j
+    while ii.between?(0,size-1) && jj.between?(0,size-1)
+      if @state[ii][jj] == TAKEN
+        return 1
+      end
+      if @state[ii][jj] == EMPTY
+        return 0
+      end
+      ii = di+ii
+      jj = dj+jj
+    end
+    0
+  end
+
+  def can_see_count i, j
+    NEIGHBORS.map {|di,dj| can_see(i, j, di, dj) }.sum
   end
 
   def tick
@@ -49,6 +72,49 @@ class GameOfButts
     end
   end
 
+  def new_tick
+    @state = @state.each_with_index.map do |r,i|
+      r.each_with_index.map do |v,j|
+        case v
+        when FLOOR
+          FLOOR
+        when EMPTY
+          if can_see_count(i, j).zero?
+            TAKEN
+          else
+            EMPTY
+          end
+        when TAKEN
+          if can_see_count(i, j) >= 5
+            EMPTY
+          else
+            TAKEN
+          end
+        else
+          raise "wat #{i}"
+        end
+      end
+    end
+  end
+
+  def run
+    prev = nil
+    while prev != tick
+      puts self.to_s
+      puts
+      prev = state
+    end
+  end
+
+  def run_new
+    prev = nil
+    while prev != new_tick
+      puts self.to_s
+      puts
+      prev = state
+    end
+  end
+
   def occupied
     @state.map { |r| r.count{ |s| s == TAKEN } }.sum
   end
@@ -61,11 +127,6 @@ end
 if __FILE__ == $0
   input = ARGF.read.chomp
   game = GameOfButts.new(input)
-  prev = nil
-  while prev != game.tick
-    puts game.to_s
-    puts
-    prev = game.state
-  end
+  game.run_new
   puts game.occupied
 end

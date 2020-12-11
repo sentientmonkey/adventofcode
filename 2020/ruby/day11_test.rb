@@ -116,4 +116,88 @@ class TestGameOfButts < Minitest::Test
     game = GameOfButts.new input
     assert_equal game.occupied, 37
   end
+
+  def test_can_see_seats
+    input = <<~EOS
+    .......#.
+    ...#.....
+    .#.......
+    .........
+    ..#L....#
+    ....#....
+    .........
+    #........
+    ...#.....
+    EOS
+
+    game = GameOfButts.new input
+    assert_equal game.state[4][3], GameOfButts::EMPTY
+    assert_equal 8, game.can_see_count(4,3)
+  end
+
+  def test_can_see_no_seats
+    input = <<~EOS
+    .##.##.
+    #.#.#.#
+    ##...##
+    ...L...
+    ##...##
+    #.#.#.#
+    .##.##.
+    EOS
+
+    game = GameOfButts.new input
+    assert_equal game.state[3][3], GameOfButts::EMPTY
+    assert_equal 0, game.can_see_count(3,3)
+  end
+
+  def test_new_rules
+    input = <<~EOS
+    L.LL.LL.LL
+    LLLLLLL.LL
+    L.L.L..L..
+    LLLL.LL.LL
+    L.LL.LL.LL
+    L.LLLLL.LL
+    ..L.L.....
+    LLLLLLLLLL
+    L.LLLLLL.L
+    L.LLLLL.LL
+    EOS
+
+    game = GameOfButts.new input
+
+    round_one = <<~EOS.chomp
+    #.##.##.##
+    #######.##
+    #.#.#..#..
+    ####.##.##
+    #.##.##.##
+    #.#####.##
+    ..#.#.....
+    ##########
+    #.######.#
+    #.#####.##
+    EOS
+
+    game.new_tick
+    assert_equal round_one, game.to_s
+
+    round_two = <<~EOS.chomp
+    #.LL.LL.L#
+    #LLLLLL.LL
+    L.L.L..L..
+    LLLL.LL.LL
+    L.LL.LL.LL
+    L.LLLLL.LL
+    ..L.L.....
+    LLLLLLLLL#
+    #.LLLLLL.L
+    #.LLLLL.L#
+    EOS
+
+    game.new_tick
+    assert_equal round_two, game.to_s
+  end
+
 end
