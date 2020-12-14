@@ -24,14 +24,14 @@ class Timetable
     bus_routes.find{ |route| time%route == 0 }
   end
 
-  def golden_timestamp
-    (start_at..).lazy
+  def golden_timestamp n:nil
+    (start_at..n).lazy
       .each_cons(all_routes.size)
       .find do |times| 
           times.zip(all_routes).all? do |time, route| 
             can_stop? time, route 
           end
-      end.first
+      end&.first
   end
 
   def can_stop? time, route

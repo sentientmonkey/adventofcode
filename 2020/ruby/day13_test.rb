@@ -1,4 +1,5 @@
 require "minitest/autorun"
+require "minitest/benchmark"
 require "minitest/pride"
 
 require_relative "day13.rb"
@@ -35,11 +36,22 @@ class TestTimetable < Minitest::Test
 
     timetable = Timetable.new "0\n67,7,x,59,61"
     assert_equal 1261476, timetable.golden_timestamp
-
   end
 
   def test_too_slow
     timetable = Timetable.new "0\n1789,37,47,1889", start_at:1200000000
     assert_equal 1202161486, timetable.golden_timestamp
+  end
+end
+
+class TestBenchTimetable < Minitest::Benchmark
+  def setup
+    @timetable = Timetable.new "0\n1789,37,47,1889", start_at:0
+  end
+
+  def bench_my_algorithm
+    assert_performance_linear 0.9999 do |n|
+      @timetable.golden_timestamp n:n
+    end
   end
 end
