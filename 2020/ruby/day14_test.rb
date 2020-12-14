@@ -33,4 +33,21 @@ class TestTimetable < Minitest::Test
     port = Port.new input
     assert_equal 165, port.checksum
   end
+
+  def test_wildcards
+    port = Port.new
+    port.mask = "000000000000000000000000000000X1001X"
+    assert_equal [26,27,58,59], port.amask(42)
+  end
+
+  def test_v2
+    input = <<~EOS
+    mask = 000000000000000000000000000000X1001X
+    mem[42] = 100
+    mask = 00000000000000000000000000000000X0XX
+    mem[26] = 1
+    EOS
+    port = Port.new input, v2:true
+    assert_equal 208, port.checksum
+  end
 end
