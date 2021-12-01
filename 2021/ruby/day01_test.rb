@@ -18,4 +18,17 @@ class SonarTest < Minitest::Test
     sonar = Sonar.new 199, 200, 208, 210, 200, 207, 240, 269, 260, 263
     assert_equal 7, sonar.increased
   end
+
+  def test_sonar_window_sums
+    sonar = Sonar.new 1, 2, 3, 4
+    assert_equal [6, 9], sonar.window_sums
+  end
+
+  def test_sonar_windows_increased
+    sonar = Sonar.new 1, 2, 3, 4
+    assert_equal 1, sonar.windows_increased
+
+    sonar = Sonar.new 199, 200, 208, 210, 200, 207, 240, 269, 260, 263
+    assert_equal 5, sonar.windows_increased
+  end
 end
