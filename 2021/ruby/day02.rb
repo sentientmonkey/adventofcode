@@ -32,9 +32,37 @@ class Submarine
   end
 end
 
+class AimingSubmarine < Submarine
+  attr_reader :aim
+
+  def initialize
+    super
+    @aim = 0
+  end
+
+  def move direction, distance
+    case direction
+    when :forward
+      @position += distance
+      @depth += distance * @aim
+    when :down
+      @aim += distance
+    when :up
+      @aim -= distance
+    else
+      raise "wat: #{direction}"
+    end
+  end
+
+end
+
 if __FILE__ == $0
   input = ARGF.read.chomp
   sub = Submarine.new
+  sub.plot_course input
+  puts sub.coord
+
+  sub = AimingSubmarine.new
   sub.plot_course input
   puts sub.coord
 end
