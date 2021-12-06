@@ -23,7 +23,10 @@ class AnalyzerTest < Minitest::Test
     EOS
 
     assert_equal 22, analyzer.gamma_rate
-    assert_equal 9, analyzer.epsilon_rate
     assert_equal 198, analyzer.power_consumption
+
+    assert_equal 23, analyzer.oxygen_generator_rating
+    assert_equal 10, analyzer.co2_scrubber_rating
+    assert_equal 230, analyzer.life_support_rating
   end
 end
