@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby -w
 
 class SquidBingo
-  attr_reader :numbers, :cards, :marked, :winning_card, :score
+  attr_reader :numbers, :cards, :marked, :winning_card, :score, :winners
 
   def initialize(input)
+    @winners = []
     @cards = []
     @marked = []
     card = []
@@ -49,12 +50,31 @@ class SquidBingo
     @score = number * unmarked_sum
   end
 
-  def find_winner
+  def play_all
+    number = nil
+    while winners.size < cards.size && !numbers.empty?
+      number = draw
+      @winners = (@winners + find_winners).uniq
+    end
+    @score = number * last_unmarked_sum
+  end
+
+ def find_winner
     marked.each_with_index do |card,idx|
       return idx+1 if card.any?{|row| row.all?{|m| m } }
       return idx+1 if card.transpose.any?{|row| row.all?{|m| m } }
     end
     nil
+  end
+
+  def find_winners
+    marked.each_with_index.reduce([]) do |acc,(card,idx)|
+      if card.any?{|row| row.all?{|m| m } } ||
+          card.transpose.any?{|row| row.all?{|m| m } }
+       acc << idx+1
+      end
+      acc
+    end
   end
 
   def unmarked_sum
@@ -68,11 +88,28 @@ class SquidBingo
     end
     total
   end
+
+  def last_unmarked_sum
+    total = 0
+    last_winner = winners.last
+    cards[last_winner-1].each_with_index do |row,y|
+      row.each_with_index do |number,x|
+        unless marked[last_winner-1][y][x]
+          total += cards[last_winner-1][y][x]
+        end
+      end
+    end
+    total
+  end
+
 end
 
 if __FILE__ == $0
   input = ARGF.read.chomp
   bingo = SquidBingo.new(input)
   bingo.play
+  puts bingo.score
+  bingo = SquidBingo.new(input)
+  bingo.play_all
   puts bingo.score
 end

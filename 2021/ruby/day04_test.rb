@@ -70,4 +70,10 @@ class SquidBingoTest < Minitest::Test
     bingo.play
     assert_equal 4512, bingo.score
   end
+
+  def test_plays_for_all_wins
+    bingo = SquidBingo.new(INPUT)
+    bingo.play_all
+    assert_equal 1924, bingo.score
+  end
 end
