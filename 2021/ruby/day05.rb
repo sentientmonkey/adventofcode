@@ -46,15 +46,14 @@ class VentMapper
   end
 
   def add_diagnals(points)
-    x1,y1,x2,y2 = points
+    x,y,x2,y2 = points
     dx, dy = delta(points)
-    x = x1
-    y = y1
     mark x, y
-    while x != x2 || y != y2
+    loop do
       x += dx
       y += dy
       mark x, y
+      break unless x != x2 || y != y2
     end
   end
 
