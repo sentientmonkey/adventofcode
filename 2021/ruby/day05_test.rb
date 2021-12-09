@@ -57,4 +57,11 @@ class VentMapperTest < Minitest::Test
     mapper = VentMapper.new INPUT
     assert_equal 5, mapper.overlaps
   end
+
+  def test_diagnals
+    mapper = VentMapper.new INPUT, diagnals: true
+    assert_contains mapper, 8, 0 
+    assert_contains mapper, 0, 8
+    assert_equal 12, mapper.overlaps
+  end
 end
