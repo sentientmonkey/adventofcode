@@ -59,5 +59,12 @@ class LaternFishCounterTest < Minitest::Test
     population.run_days! 80
     assert_equal 5934, population.size
   end
+
+  def test_big_population
+    skip "too slow"
+    population = LanternFishPopulation.new [3,4,3,1,2]
+    population.run_days! 256
+    assert_equal 26984457539, population.size
+  end
 end
 
