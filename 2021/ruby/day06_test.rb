@@ -24,7 +24,7 @@ class LaternFishCounterTest < Minitest::Test
     fish.next_day!
     assert_equal 5, fish.timer 
   end
-
+  
   def test_laternfish_reproduces
     fish = LanternFish.new 1
     assert_nil fish.next_day!
@@ -40,13 +40,20 @@ class LaternFishCounterTest < Minitest::Test
     assert_equal 5, population.size
 
     population.next_day!
-    assert_equal [2,3,2,0,1], population.timers
+    assert_equal [2,3,0,1], population.timers
+    assert_equal 5, population.size
 
     population.next_day!
-    assert_equal [1,2,1,6,0,8], population.timers
+    assert_equal [1,2,6,0,8], population.timers
+    assert_equal 6, population.size
 
     population.next_day!
-    assert_equal [0,1,0,5,6,7,8], population.timers
+    assert_equal [0,1,5,6,7,8], population.timers
+    assert_equal 7, population.size
+
+    population.next_day!
+    assert_equal [6,0,4,5,7,8], population.timers
+    assert_equal 9, population.size
   end
 
   def test_population_runs_until
@@ -61,7 +68,6 @@ class LaternFishCounterTest < Minitest::Test
   end
 
   def test_big_population
-    skip "too slow"
     population = LanternFishPopulation.new [3,4,3,1,2]
     population.run_days! 256
     assert_equal 26984457539, population.size
