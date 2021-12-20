@@ -20,4 +20,10 @@ class CrabMarinesTest < Minitest::Test
 
     assert_equal 37, marines.cheapest_fuel
   end
+
+  def test_fuel_cost_crab_math
+    marines = CrabMarines.new [16,1,2,0,4,2,7,1,2,14], crab_math: true
+
+    assert_equal 168, marines.cost_for(5)
+  end
 end
