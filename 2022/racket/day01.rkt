@@ -8,12 +8,18 @@
 (define (max-calories xs)
   (foldl max 0 (map sum xs)))
 
+(define (top-calories n xs) 
+  (sum (take (sort (map sum xs) >) n)))
+
 (module+ test
   (require rackunit)
   (define test-input '((2000 3000) (4000)))
 
   (test-case "max calories"
-    [check-equal? (max-calories test-input) 5000]))
+    [check-equal? (max-calories test-input) 5000])
+
+  (test-case "top calories"
+    [check-equal? (top-calories 2 '((1) (2) (3))) 5]))
 
 (define (read-exercise-data)
   (~> (current-command-line-arguments)
@@ -27,4 +33,5 @@
 
 (module+ main
   (let ([exercise-data (read-exercise-data)])
-    (println (max-calories exercise-data))))
+    (println (max-calories exercise-data))
+    (println (top-calories 3 exercise-data))))
