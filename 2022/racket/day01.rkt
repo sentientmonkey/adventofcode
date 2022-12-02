@@ -5,11 +5,16 @@
 (define (sum xs)
   (foldl + 0 xs))
 
-(define (max-calories xs)
-  (foldl max 0 (map sum xs)))
+(define (max-calories lst)
+  (for/fold ([acc 0])
+            ([xs lst])
+    (max acc (sum xs))))
 
 (define (top-calories n xs) 
-  (sum (take (sort (map sum xs) >) n)))
+  (~> (map sum xs)
+      (sort >)
+      (take n)
+      (sum)))
 
 (module+ test
   (require rackunit)
