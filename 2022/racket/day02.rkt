@@ -34,6 +34,41 @@
   (for/sum ([p ps])
     (score p)))
 
+(define (guess-value a)
+  (case a
+    ['A 1]
+    ['B 2]
+    ['C 3]))
+
+(define (score-value a)
+  (case a
+    ['Y 3]
+    ['X 0]
+    ['Z 6]))
+
+(define (to-choice a b)
+  (case b
+    ['Y a]
+    ['X (case a
+          ['A 'C]
+          ['B 'A]
+          ['C 'B])]
+    ['Z (case a
+          ['A 'B]
+          ['B 'C]
+          ['C 'A])]))
+
+(define (guess-score p)
+  (let* [(a (car p))
+         (b (cadr p))
+         (c (to-choice a b))]
+    (+ (score-value b)
+       (guess-value c))))
+
+(define (total-score* ps)
+  (for/sum ([p ps])
+    (guess-score p)))
+
 (module+ test
   (require rackunit)
 
@@ -48,7 +83,17 @@
 
   (test-case "total-scores"
     [check-equal?
-      (total-score '((A Y) (B X) (C Z))) 15]))
+      (total-score '((A Y) (B X) (C Z))) 15])
+
+  (test-case "guess-score"
+    [check-equal? (guess-score '(A Y)) 4]
+    [check-equal? (guess-score '(B X)) 1]
+    [check-equal? (guess-score '(C Z)) 7])
+
+  (test-case "guess-total"
+    [check-equal?
+      (total-score* '((A Y) (B X) (C Z))) 12]))
+
 
 (define (read-exercise-data)
   (~> (current-command-line-arguments)
@@ -62,4 +107,5 @@
 
 (module+ main
   (let ([exercise-data (read-exercise-data)])
-    (println (total-score exercise-data))))
+    (println (total-score exercise-data))
+    (println (total-score* exercise-data))))
