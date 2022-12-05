@@ -2,10 +2,16 @@
 
 (require threading)
 
-(define (move-crates! stacks n from to)
+
+(define (make-move model crates)
+  (if (eq? model 9001)
+    crates
+    (reverse crates)))
+
+(define (move-crates! model stacks n from to)
   (let* ([from-stack (vector-ref stacks (sub1 from))]
          [to-stack (vector-ref stacks (sub1 to))]
-         [crates (reverse (take-right from-stack n))])
+         [crates (make-move model (take-right from-stack n))])
     (vector-set! stacks (sub1 to) (append to-stack crates))
     (vector-set! stacks (sub1 from) (drop-right from-stack n))))
 
@@ -26,12 +32,12 @@
         (drop _ 1)
         (map string->number))))
 
-(define (get-message-for-moves stacks lines)
+(define (get-message-for-moves model stacks lines)
   (for* ([move (parse-moves lines)])
     (let ([n (first move)]
           [from (second move)]
           [to (third move)])
-      (move-crates! stacks n from to)))
+      (move-crates! model stacks n from to)))
   (top-crates-message stacks))
 
 (define (read-exercise-data)
@@ -47,29 +53,30 @@
   (test-case "move-crates"
     (let ([stacks (list->vector '((Z N)
                                   (M C D)
-                                  (P)))])
-      (move-crates! stacks 1 2 1)
+                                  (P)))]
+          [model 9000])
+      (move-crates! model stacks 1 2 1)
       [check-equal?
         (vector->list stacks)
         '((Z N D)
          (M C)
          (P))]
 
-      (move-crates! stacks 3 1 3)
+      (move-crates! model stacks 3 1 3)
       [check-equal?
         (vector->list stacks)
         '(()
          (M C)
          (P D N Z))]
 
-      (move-crates! stacks 2 2 1)
+      (move-crates! model stacks 2 2 1)
       [check-equal?
         (vector->list stacks)
         '((C M)
          ()
          (P D N Z))]
 
-      (move-crates! stacks 1 1 2)
+      (move-crates! model stacks 1 1 2)
       [check-equal?
         (vector->list stacks)
         '((C)
@@ -95,17 +102,18 @@
         (1 1 2))]))
 
 (module+ main
+  (define initial-stack
+    '((W R F)
+      (T H M C D V W P)
+      (P M Z N L)
+      (J C H R)
+      (C P G H Q T B)
+      (G C W L F Z)
+      (W V L Q Z J G C)
+      (P N R F W T V C)
+      (J W H G R S V)))
   (let ([exercise-data (read-exercise-data)])
-    (let ([stack
-            (list->vector
-              '((W R F)
-                (T H M C D V W P)
-                (P M Z N L)
-                (J C H R)
-                (C P G H Q T B)
-                (G C W L F Z)
-                (W V L Q Z J G C)
-                (P N R F W T V C)
-                (J W H G R S V)
-              ))])
-     (println (get-message-for-moves stack exercise-data)))))
+    (let ([stack (list->vector initial-stack)])
+     (println (get-message-for-moves 9000 stack exercise-data)))
+    (let ([stack (list->vector initial-stack)])
+     (println (get-message-for-moves 9001 stack exercise-data)))))
