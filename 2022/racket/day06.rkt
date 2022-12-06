@@ -3,22 +3,32 @@
 (require threading)
 (require racket/set)
 
+(define (no-duplicates xs)
+  (= (set-count (list->set xs)) (length xs)))
+
 (define (is-marker xs)
   (and (> (length xs) 3)
-       (= (set-count (list->set xs)) 4)))
+       (no-duplicates xs)))
 
 (define (string->signals s)
   (map (λ~> string string->symbol)
        (string->list s)))
 
-(define (find-marker-index-helper xs i)
-  (if (is-marker (take xs 4))
-    (+ 4 i)
-    (find-marker-index-helper (cdr xs) (add1 i))))
+(define (find-unique-index-helper xs n i)
+  (if (and (> (length xs) n)
+           (no-duplicates (take xs n)))
+    (+ n i)
+    (find-unique-index-helper (cdr xs) n (add1 i))))
+
+(define (find-unique-index s n)
+  (let ([xs (string->signals s)])
+    (find-unique-index-helper xs n 0)))
 
 (define (find-marker-index s)
-  (let ([xs (string->signals s)])
-    (find-marker-index-helper xs 0)))
+  (find-unique-index s 4))
+
+(define (find-message-index s)
+  (find-unique-index s 14))
 
 (define (read-exercise-data)
   (~> (current-command-line-arguments)
@@ -40,8 +50,17 @@
     [check-equal? (find-marker-index "mjqjpqmgbljsphdztnvjfqwrcgsmlb") 7]
     [check-equal? (find-marker-index "bvwbjplbgvbhsrlpgdmjqwftvncz") 5]
     [check-equal? (find-marker-index "nppdvjthqldpwncqszvftbrmjlhg") 6]
-    [check-equal? (find-marker-index "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw") 11]))
+    [check-equal? (find-marker-index "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg") 10]
+    [check-equal? (find-marker-index "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw") 11])
+
+  (test-case "find-message-index"
+    [check-equal? (find-message-index "mjqjpqmgbljsphdztnvjfqwrcgsmlb") 19]
+    [check-equal? (find-message-index "bvwbjplbgvbhsrlpgdmjqwftvncz") 23]
+    [check-equal? (find-message-index "nppdvjthqldpwncqszvftbrmjlhg") 23]
+    [check-equal? (find-message-index "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg") 29]
+    [check-equal? (find-message-index "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw") 26]))
 
 (module+ main
   (let ([exercise-data (read-exercise-data)])
-    (println (find-marker-index exercise-data))))
+    (println (find-marker-index exercise-data))
+    (println (find-message-index exercise-data))))
