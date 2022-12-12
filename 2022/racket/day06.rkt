@@ -61,6 +61,6 @@
     [check-equal? (find-message-index "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw") 26]))
 
 (module+ main
-  (let ([exercise-data (read-exercise-data)])
+  (time (let ([exercise-data (read-exercise-data)])
     (println (find-marker-index exercise-data))
-    (println (find-message-index exercise-data))))
+    (println (find-message-index exercise-data)))))
