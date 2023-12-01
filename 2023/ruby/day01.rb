@@ -1,6 +1,18 @@
 class Day01
   attr_reader :input
 
+  DIGITS = {
+    'one' => 1,
+    'two' => 2,
+    'three' => 3,
+    'four' => 4,
+    'five' => 5,
+    'six' => 6,
+    'seven' => 7,
+    'eight' => 8,
+    'nine' => 9
+  }.freeze
+
   def initialize(input)
     @input = input
   end
@@ -16,8 +28,15 @@ class Day01
   end
 
   def extract(line)
-    d = line.scan(/\d/)
-    [d[0], d[-1]].join.to_i
+    xs = line
+         .scan(/(?=(\d|one|two|three|four|five|six|seven|eight|nine))/)
+         .flatten
+         .map { |d| to_number(d) }
+    [xs[0], xs[-1]].join.to_i
+  end
+
+  def to_number(digit)
+    DIGITS.fetch(digit) { digit }.to_s
   end
 end
 

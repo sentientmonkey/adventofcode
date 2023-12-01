@@ -1,0 +1,18 @@
+require 'rspec/core/rake_task'
+require 'rubocop/rake_task'
+
+task default: %i[rubocop spec]
+
+desc 'Run the specs.'
+task :spec do
+  RSpec::Core::RakeTask.new do |t|
+    t.pattern = '*_spec.rb'
+  end
+end
+
+desc 'Run rubocop'
+task :rubocop do
+  RuboCop::RakeTask.new do |t|
+    t.patterns = ['*.rb']
+  end
+end
