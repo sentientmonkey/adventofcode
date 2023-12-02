@@ -12,6 +12,18 @@ Game = Data.define(:number, :rounds) do
       end
     end
   end
+
+  def min_cubes
+    rounds.each_with_object({}) do |guesses, mins|
+      guesses.each do |color, count|
+        mins[color] = [mins.fetch(color, 0), count].max
+      end
+    end
+  end
+
+  def power
+    min_cubes.values.inject(1, :*)
+  end
 end
 
 class Day02
@@ -42,6 +54,14 @@ class Day02
   def checksum
     valid_games.map(&:number).sum
   end
+
+  def powersum
+    games.map(&:power).sum
+  end
 end
 
-puts Day02.new(ARGF.read).checksum if __FILE__ == $0
+if __FILE__ == $0
+  d = Day02.new(ARGF.read)
+  puts d.checksum
+  puts d.powersum
+end

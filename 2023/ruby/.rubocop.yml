@@ -1,8 +1,14 @@
 AllCops:
   NewCops: enable
+Style/SpecialGlobalVars:
+  Enabled: false
 Style/Documentation:
   Enabled: false
 Style/FrozenStringLiteralComment:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Metrics/MethodLength:
   Enabled: false
 Metrics/BlockLength:
   Enabled: false

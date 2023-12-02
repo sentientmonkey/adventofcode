@@ -40,4 +40,24 @@ RSpec.describe Day02 do
 
     expect(actual).to be(8)
   end
+
+  it 'should find min cubes' do
+    actual = exercise.games.first.min_cubes
+
+    expect(actual).to include(
+      red: 4,
+      green: 2,
+      blue: 6
+    )
+  end
+
+  it 'should have power' do
+    actual = exercise.games.first
+
+    expect(actual.power).to eq(48)
+  end
+
+  it 'should have powersum' do
+    expect(exercise.powersum).to eq(2286)
+  end
 end
