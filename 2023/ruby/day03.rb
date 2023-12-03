@@ -1,3 +1,28 @@
+class CurrMatch
+  attr_reader :is_match
+
+  def initialize
+    reset!
+  end
+
+  def add(m)
+    @matches.push(m)
+  end
+
+  def matched
+    @matches.join
+  end
+
+  def match!
+    @is_match = true
+  end
+
+  def reset!
+    @matches = []
+    @is_match = false
+  end
+end
+
 class Day03
   attr_reader :input
 
@@ -22,21 +47,19 @@ class Day03
 
   def parts
     matched = []
+    curr = CurrMatch.new
     engine.each_with_index do |row, y|
-      curr = []
-      is_match = false
+      curr.reset!
       row.each_with_index do |pos, x|
         if digit?(pos)
-          curr << pos
+          curr.add(pos)
         else
           # gross
-          is_match = true if neighbors(x, y).any? { |d| symbol?(d) }
-          matched << curr.join if is_match
-          curr = []
-          is_match = false
-          next
+          curr.match! if neighbors(x, y).any? { |d| symbol?(d) }
+          matched << curr.matched if curr.is_match
+          curr.reset!
         end
-        is_match = true if neighbors(x, y).any? { |d| symbol?(d) }
+        curr.match! if neighbors(x, y).any? { |d| symbol?(d) }
       end
     end
     matched.map(&:to_i)

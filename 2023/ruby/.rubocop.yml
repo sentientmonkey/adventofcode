@@ -6,6 +6,8 @@ Style/Documentation:
   Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: false
+Naming/MethodParameterName:
+  Enabled: false
 Metrics/AbcSize:
   Enabled: false
 Metrics/MethodLength:
