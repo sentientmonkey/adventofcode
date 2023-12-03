@@ -53,13 +53,12 @@ class Day03
       row.each_with_index do |pos, x|
         if digit?(pos)
           curr.add(pos)
-        else
-          # gross
           curr.match! if neighbors(x, y).any? { |d| symbol?(d) }
+        end
+        unless digit?(peek(x, y))
           matched << curr.matched if curr.is_match
           curr.reset!
         end
-        curr.match! if neighbors(x, y).any? { |d| symbol?(d) }
       end
     end
     matched.map(&:to_i)
@@ -80,12 +79,16 @@ class Day03
     engine[y][x]
   end
 
+  def peek(x, y)
+    get_value(x + 1, y)
+  end
+
   def digit?(char)
-    char.match(/[0-9]/)
+    char&.match(/[0-9]/)
   end
 
   def symbol?(char)
-    char.match(/[^\.0-9]/)
+    char&.match(/[^\.0-9]/)
   end
 
   def sum
