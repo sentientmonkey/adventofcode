@@ -22,12 +22,15 @@ class Day03
 
   def parts
     matched = []
-    curr = []
-    is_match = false
     engine.each_with_index do |row, y|
+      curr = []
+      is_match = false
       row.each_with_index do |pos, x|
-        curr << pos
-        unless digit?(pos)
+        if digit?(pos)
+          curr << pos
+        else
+          # gross
+          is_match = true if neighbors(x, y).any? { |d| symbol?(d) }
           matched << curr.join if is_match
           curr = []
           is_match = false

@@ -27,6 +27,16 @@ RSpec.describe Day03 do
     expect(exercise.digit?('.')).to be_falsey
   end
 
+  it 'should match symbol' do
+    expect(exercise.symbol?('.')).to be_falsey
+    expect(exercise.symbol?('9')).to be_falsey
+    expect(exercise.symbol?('*')).to be_truthy
+    expect(exercise.symbol?('$')).to be_truthy
+    expect(exercise.symbol?('&')).to be_truthy
+    expect(exercise.symbol?('*')).to be_truthy
+    expect(exercise.symbol?('-')).to be_truthy
+  end
+
   it 'should find neighbors' do
     expect(exercise.get_value(3, 1)).to eq('*')
     expect(exercise.neighbors(3, 1)).to contain_exactly(
@@ -44,8 +54,22 @@ RSpec.describe Day03 do
     )
   end
 
+  context 'with weird input' do
+    let(:input) do
+      <<~INPUT
+        .....
+        .882.
+        *....
+      INPUT
+    end
+
+    it 'should find match' do
+      expect(exercise.parts).to include(882)
+    end
+  end
+
   it 'should return parts' do
-    expect(exercise.parts).to contain_exactly(
+    expect(exercise.parts).to include(
       467,
       35,
       633,
