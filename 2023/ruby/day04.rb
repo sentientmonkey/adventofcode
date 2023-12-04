@@ -1,12 +1,14 @@
 Card = Data.define(:number, :winners, :actual) do
   def actual_winners
-    winners.intersection actual
+    actual.select do |n|
+      winners.include?(n)
+    end
   end
 
   def points
     win_count = actual_winners.size
-    if win_count > 2
-      win_count * 2
+    if win_count > 1
+      2**(win_count - 1)
     else
       win_count
     end
@@ -26,8 +28,8 @@ class Day04
 
       Card.new(
         match[1].to_i,
-        match[2].squeeze.split.map(&:to_i),
-        match[3].squeeze.split.map(&:to_i)
+        match[2].split.map(&:to_i),
+        match[3].split.map(&:to_i)
       )
     end
   end
