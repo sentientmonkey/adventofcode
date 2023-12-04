@@ -41,4 +41,27 @@ RSpec.describe Day04 do
 
     expect(exercise.total_points).to eq(13)
   end
+
+  it 'should find next cards' do
+    card = exercise.cards.first
+    expect(card.next_cards).to contain_exactly(
+      2, 3, 4, 5
+    )
+    expect(exercise.cards[1].next_cards).to contain_exactly(
+      3, 4
+    )
+  end
+
+  it 'should count cards' do
+    expect(exercise.collect_all).to eq(
+      {
+        1 => 1,
+        2 => 2,
+        3 => 4,
+        4 => 8,
+        5 => 14,
+        6 => 1
+      }
+    )
+  end
 end
