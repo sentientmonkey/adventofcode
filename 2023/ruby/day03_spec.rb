@@ -38,18 +38,18 @@ RSpec.describe Day03 do
   end
 
   it 'should find neighbors' do
-    expect(exercise.get_value(3, 1)).to eq('*')
-    expect(exercise.neighbors(3, 1)).to contain_exactly(
+    expect(exercise.get_value(exercise.engine, 3, 1)).to eq('*')
+    expect(exercise.neighbors(exercise.engine, 3, 1)).to contain_exactly(
       '.', '.', '.', '5', '3', '.', '7', '.'
     )
 
-    expect(exercise.get_value(0, 0)).to eq('4')
-    expect(exercise.neighbors(0, 0)).to contain_exactly(
+    expect(exercise.get_value(exercise.engine, 0, 0)).to eq('4')
+    expect(exercise.neighbors(exercise.engine, 0, 0)).to contain_exactly(
       '6', '.', '.'
     )
 
-    expect(exercise.get_value(9, 9)).to eq('.')
-    expect(exercise.neighbors(9, 9)).to contain_exactly(
+    expect(exercise.get_value(exercise.engine, 9, 9)).to eq('.')
+    expect(exercise.neighbors(exercise.engine, 9, 9)).to contain_exactly(
       '.', '.', '.'
     )
   end
@@ -83,5 +83,40 @@ RSpec.describe Day03 do
 
   it 'should have sum' do
     expect(exercise.sum).to eq(4361)
+  end
+
+  it 'should have normalized engine' do
+    expect(exercise.normalized_engine.first).to eq(
+      [467, 467, 467, nil, nil, 114, 114, 114, nil, nil]
+    )
+    expect(exercise.normalized_engine[1]).to eq(
+      [nil, nil, nil, '*', nil, nil, nil, nil, nil, nil]
+    )
+  end
+
+  it 'should find neighbors for gear' do
+    expect(exercise.get_value(exercise.normalized_engine, 3, 1)).to eq('*')
+    expect(exercise.unique_neighbors(exercise.normalized_engine, 3, 1)).to contain_exactly(
+      467, 35
+    )
+  end
+
+  it 'should return gears' do
+    expect(exercise.gears).to eq(
+      [
+        [35, 467],
+        [755, 598]
+      ]
+    )
+  end
+
+  it 'should return gear ratios' do
+    expect(exercise.gear_ratios).to eq(
+      [16_345, 451_490]
+    )
+  end
+
+  it 'should return gear ratio checksum' do
+    expect(exercise.gear_ratio_checksum).to eq(467_835)
   end
 end

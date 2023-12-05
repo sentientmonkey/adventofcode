@@ -34,6 +34,30 @@ class Day03
     @engine ||= input.split("\n").map(&:chars)
   end
 
+  def normalized_engine
+    @normalized_engine ||= begin
+      e = []
+      engine.each_with_index do |row, y|
+        curr = []
+        row.each_with_index do |pos, x|
+          e << []
+          if digit?(pos)
+            curr << pos
+          else
+            unless curr.empty?
+              ((x - curr.size)...x).each do |cx|
+                e[y][cx] = curr.join.to_i
+              end
+              curr = []
+            end
+            e[y][x] = (pos if pos != '.')
+          end
+        end
+      end
+      e
+    end
+  end
+
   COORDS = [
     [0, -1],
     [1, -1],
@@ -53,9 +77,9 @@ class Day03
       row.each_with_index do |pos, x|
         if digit?(pos)
           curr.add(pos)
-          curr.match! if neighbors(x, y).any? { |d| symbol?(d) }
+          curr.match! if neighbors(engine, x, y).any? { |d| symbol?(d) }
         end
-        unless digit?(peek(x, y))
+        unless digit?(peek(engine, x, y))
           matched << curr.matched if curr.is_match
           curr.reset!
         end
@@ -64,23 +88,48 @@ class Day03
     matched.map(&:to_i)
   end
 
-  def neighbors(x, y)
+  def gears
+    matched = []
+    normalized_engine.each_with_index do |row, y|
+      row.each_with_index do |pos, x|
+        next unless gear?(pos)
+
+        n = unique_neighbors(normalized_engine, x, y)
+        matched << n if n.size == 2
+      end
+    end
+    matched
+  end
+
+  def gear_ratios
+    gears.map { |g| g.inject(1, :*) }
+  end
+
+  def gear_ratio_checksum
+    gear_ratios.sum
+  end
+
+  def neighbors(e, x, y)
     COORDS.each_with_object([]) do |r, acc|
       posx = r[0] + x
       posy = r[1] + y
-      val = get_value(posx, posy)
+      val = get_value(e, posx, posy)
       acc << val if val
     end
   end
 
-  def get_value(x, y)
-    return unless x >= 0 && y >= 0 && x < engine.first.size && y < engine.size
-
-    engine[y][x]
+  def unique_neighbors(e, x, y)
+    neighbors(e, x, y).uniq
   end
 
-  def peek(x, y)
-    get_value(x + 1, y)
+  def get_value(e, x, y)
+    return unless x >= 0 && y >= 0 && x < e.first.size && y < e.size
+
+    e[y][x]
+  end
+
+  def peek(e, x, y)
+    get_value(e, x + 1, y)
   end
 
   def digit?(char)
@@ -91,6 +140,10 @@ class Day03
     char&.match(/[^\.0-9]/)
   end
 
+  def gear?(char)
+    char == '*'
+  end
+
   def sum
     parts.sum
   end
@@ -99,4 +152,5 @@ end
 if __FILE__ == $0
   d = Day03.new(ARGF.read)
   puts d.sum
+  puts d.gear_ratio_checksum
 end
