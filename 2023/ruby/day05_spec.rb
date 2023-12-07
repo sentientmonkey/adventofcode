@@ -62,9 +62,8 @@ RSpec.describe Day05 do
   it 'should have mappings' do
     first_map = exercise.maps.first
 
-    expect(first_map.mappings[50]).to eq(52)
-    expect(first_map.mappings[51]).to eq(53)
-    expect(first_map.mappings[96]).to eq(98)
+    expect(first_map.mappings[98..100]).to eq(-48)
+    expect(first_map.mappings[50..98]).to eq(2)
   end
 
   it 'should be able to lookup locations' do

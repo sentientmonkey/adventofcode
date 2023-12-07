@@ -1,6 +1,9 @@
 Map = Data.define(:source, :dest, :mappings) do
   def lookup(n)
-    mappings.fetch(n, n)
+    mappings.each do |k, v|
+      return n + v if k.cover?(n)
+    end
+    n
   end
 end
 
@@ -18,9 +21,7 @@ class Day05
         map = Map.new(*Regexp.last_match[1..2], {})
         section.split("\n")[1..].each do |line|
           dest, source, len = line.split.map(&:to_i)
-          len.times do |n|
-            map.mappings[source + n] = dest + n
-          end
+          map.mappings[source..(source + len)] = dest - source
         end
 
         @maps << map
