@@ -85,4 +85,8 @@ RSpec.describe Day05 do
   it 'should find lowest location' do
     expect(exercise.lowest_location).to eq(35)
   end
+
+  it 'should find lowest location ranges' do
+    expect(exercise.lowest_location_ranges).to eq(46)
+  end
 end

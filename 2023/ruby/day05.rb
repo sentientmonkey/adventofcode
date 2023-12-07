@@ -38,9 +38,18 @@ class Day05
   def lowest_location
     seeds.map { |s| find_location(s) }.min
   end
+
+  def lowest_location_ranges
+    seeds.each_slice(2).map do |a, b|
+      a.upto(a + b).map do |s|
+        find_location(s)
+      end.min
+    end.min
+  end
 end
 
 if __FILE__ == $0
   d = Day05.new(ARGF.read)
   puts d.lowest_location
+  puts d.lowest_location_ranges
 end
