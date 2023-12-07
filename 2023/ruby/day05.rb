@@ -41,10 +41,13 @@ class Day05
 
   def lowest_location_ranges
     seeds.each_slice(2).map do |a, b|
-      a.upto(a + b).map do |s|
-        find_location(s)
-      end.min
-    end.min
+      Ractor.new(a, b, self) do |ra, rb, k|
+        puts "R: #{ra}-#{rb}"
+        ra.upto(ra + rb).map do |s|
+          k.find_location(s)
+        end
+      end
+    end.map(&:take).min.min
   end
 end
 
