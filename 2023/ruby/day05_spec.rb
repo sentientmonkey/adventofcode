@@ -62,8 +62,8 @@ RSpec.describe Day05 do
   it 'should have mappings' do
     first_map = exercise.maps.first
 
-    expect(first_map.mappings[98..100]).to eq(-48)
-    expect(first_map.mappings[50..98]).to eq(2)
+    expect(first_map.mappings[0]).to eq([98..100, -48])
+    expect(first_map.mappings[1]).to eq([50..98, 2])
   end
 
   it 'should be able to lookup locations' do
@@ -84,6 +84,22 @@ RSpec.describe Day05 do
 
   it 'should find lowest location' do
     expect(exercise.lowest_location).to eq(35)
+  end
+
+  it 'should lookup range' do
+    first_map = exercise.maps.first
+
+    expect(first_map.lookup_range(79..93)).to eq(
+      [81..95]
+    )
+
+    expect(first_map.lookup_range(55..68)).to eq(
+      [57..70]
+    )
+
+    expect(first_map.lookup_range(102..104)).to eq(
+      [102..104]
+    )
   end
 
   it 'should find lowest location ranges' do

@@ -5,6 +5,19 @@ Map = Data.define(:source, :dest, :mappings) do
     end
     n
   end
+
+  def lookup_range(r)
+    results = []
+    mappings.each do |k, v|
+      pp "k=#{k}, r=#{r}, v=#{v}"
+      next unless k.cover?(r)
+
+      results << Range.new(r.begin + v, r.end + v)
+    end
+    results << r if results.empty?
+
+    results
+  end
 end
 
 class Day05
@@ -18,10 +31,10 @@ class Day05
       when /seeds: /
         @seeds = section.scan(/\d+/).map(&:to_i)
       when /([a-z]+)-to-([a-z]+) map:/
-        map = Map.new(*Regexp.last_match[1..2], {})
+        map = Map.new(*Regexp.last_match[1..2], [])
         section.split("\n")[1..].each do |line|
           dest, source, len = line.split.map(&:to_i)
-          map.mappings[source..(source + len)] = dest - source
+          map.mappings << [source..(source + len), dest - source]
         end
 
         @maps << map
@@ -42,7 +55,6 @@ class Day05
   def lowest_location_ranges
     seeds.each_slice(2).map do |a, b|
       Ractor.new(a, b, self) do |ra, rb, k|
-        puts "R: #{ra}-#{rb}"
         ra.upto(ra + rb).map do |s|
           k.find_location(s)
         end
