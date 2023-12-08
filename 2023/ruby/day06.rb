@@ -1,9 +1,13 @@
 class Day06
   attr_reader :times, :distances
 
-  def initialize(input)
+  def initialize(input, kerning: false)
     input.split("\n").each do |line|
-      numbers = line.scan(/\d+/).map(&:to_i)
+      numbers = if kerning
+                  [line.scan(/\d+/).join.to_i]
+                else
+                  line.scan(/\d+/).map(&:to_i)
+                end
       case line
       when /Time:/
         @times = numbers
@@ -32,6 +36,10 @@ class Day06
 end
 
 if __FILE__ == $0
-  exercise = Day06.new ARGF.read
+  input = ARGF.read
+  exercise = Day06.new input
+  puts exercise.win_product
+
+  exercise = Day06.new input, kerning: true
   puts exercise.win_product
 end
