@@ -31,19 +31,19 @@ RSpec.describe Day07 do
     end
 
     it 'should return type for hands' do
-      expect(hand_type('32T3K')).to eq(2)
-      expect(hand_type('KTJJT')).to eq(3)
-      expect(hand_type('KK677')).to eq(3)
-      expect(hand_type('T55J5')).to eq(4)
-      expect(hand_type('QQQJA')).to eq(4)
+      expect(hand_type('32T3K')).to eq(:one_pair)
+      expect(hand_type('KTJJT')).to eq(:two_pair)
+      expect(hand_type('KK677')).to eq(:two_pair)
+      expect(hand_type('T55J5')).to eq(:three_of_a_kind)
+      expect(hand_type('QQQJA')).to eq(:three_of_a_kind)
 
-      expect(hand_type('AAAAA')).to eq(7)
-      expect(hand_type('AA8AA')).to eq(6)
-      expect(hand_type('23332')).to eq(5)
-      expect(hand_type('TTT98')).to eq(4)
-      expect(hand_type('23432')).to eq(3)
-      expect(hand_type('A23A4')).to eq(2)
-      expect(hand_type('23456')).to eq(1)
+      expect(hand_type('AAAAA')).to eq(:five_of_a_kind)
+      expect(hand_type('AA8AA')).to eq(:four_of_a_kind)
+      expect(hand_type('23332')).to eq(:full_house)
+      expect(hand_type('TTT98')).to eq(:three_of_a_kind)
+      expect(hand_type('23432')).to eq(:two_pair)
+      expect(hand_type('A23A4')).to eq(:one_pair)
+      expect(hand_type('23456')).to eq(:high_card)
     end
 
     it 'should return values' do
@@ -75,19 +75,28 @@ RSpec.describe Day07 do
     end
 
     it 'should return type for hands' do
-      expect(hand_type('32T3K')).to eq(2)
-      expect(hand_type('KTJJT')).to eq(6)
-      expect(hand_type('KK677')).to eq(3)
-      expect(hand_type('T55J5')).to eq(6)
-      expect(hand_type('QQQJA')).to eq(6)
+      expect(hand_type('32T3K')).to eq(:one_pair)
+      expect(hand_type('KTJJT')).to eq(:four_of_a_kind)
+      expect(hand_type('KK677')).to eq(:two_pair)
+      expect(hand_type('T55J5')).to eq(:four_of_a_kind)
+      expect(hand_type('QQQJA')).to eq(:four_of_a_kind)
 
-      expect(hand_type('AAAAA')).to eq(7)
-      expect(hand_type('AA8AA')).to eq(6)
-      expect(hand_type('23332')).to eq(5)
-      expect(hand_type('TTT98')).to eq(4)
-      expect(hand_type('23432')).to eq(3)
-      expect(hand_type('A23A4')).to eq(2)
-      expect(hand_type('23456')).to eq(1)
+      expect(hand_type('AAAAA')).to eq(:five_of_a_kind)
+      expect(hand_type('AA8AA')).to eq(:four_of_a_kind)
+      expect(hand_type('23332')).to eq(:full_house)
+      expect(hand_type('TTT98')).to eq(:three_of_a_kind)
+      expect(hand_type('23432')).to eq(:two_pair)
+      expect(hand_type('A23A4')).to eq(:one_pair)
+      expect(hand_type('23456')).to eq(:high_card)
+
+      expect(hand_type('AAAAJ')).to eq(:five_of_a_kind)
+      expect(hand_type('AJ8AA')).to eq(:four_of_a_kind)
+      expect(hand_type('23J32')).to eq(:full_house)
+      expect(hand_type('TTJ98')).to eq(:three_of_a_kind)
+      expect(hand_type('234J2')).to eq(:three_of_a_kind)
+      expect(hand_type('A23J4')).to eq(:one_pair)
+
+      expect(hand_type('JJJJJ')).to eq(:five_of_a_kind)
     end
 
     it 'should return values' do
