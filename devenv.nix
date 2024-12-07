@@ -3,6 +3,9 @@
 {
   packages = [ pkgs.git ];
 
-  languages.ruby.enable = true;
-  languages.ruby.package = pkgs.ruby_3_2;
+  languages.ruby = {
+    enable = true;
+    package = pkgs.ruby_3_3;
+  };
+  languages.racket = { enable = true; };
 }
