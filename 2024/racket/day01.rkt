@@ -11,7 +11,8 @@
             (append b (cdr x)))))
 
 (define (into-sorted-lists xs)
-  (map (λ(x) (sort x <)) xs))
+  (for/list ([x xs])
+    (sort x <)))
 
 (define (distance-between xs)
   (let ([a (car xs)]
@@ -29,6 +30,24 @@
       into-sorted-lists
       distance-between
       distance-checksum))
+
+(define (tally xs)
+  (for/fold ([acc #hash()])
+            ([x xs])
+    (hash-update acc x add1 0)))
+
+(define (sim-scores lst hsh)
+  (for/list ([x lst])
+    (* x (hash-ref hsh x 0))))
+
+(define (sim-score-total xs)
+  (for/sum ([x xs]) x))
+
+(define (check-similarity xs)
+  (letrec ([lst (into-lists xs)]
+           [nums (car lst)]
+           [hsh (tally (cadr lst))])
+    (sim-score-total (sim-scores nums hsh))))
 
 (module+ test
   (require rackunit)
@@ -69,7 +88,27 @@
   (test-case "check-distance"
     [check-equal?
       (check-distance test-input)
-      11]))
+      11])
+
+  (test-case "tally"
+    [check-equal?
+      (tally '(4 3 5 3 9 3))
+      #hash((4 . 1) (3 . 3) (5 . 1) (9 . 1))])
+
+  (test-case "sim-scores"
+    [check-equal?
+      (sim-scores '(3 4 2 1 3 3) #hash((4 . 1) (3 . 3) (5 . 1) (9 . 1)))
+      '(9 4 0 0 9 9)])
+
+  (test-case "sim-scores-total"
+    [check-equal?
+      (sim-score-total '(9 4 0 0 9 9))
+      31])
+
+  (test-case "check-similarity"
+    [check-equal?
+      (check-similarity test-input)
+      31]))
 
 (define (read-exercise-data)
   (~> (current-command-line-arguments)
@@ -83,4 +122,5 @@
 
 (module+ main
   (let ([exercise-data (read-exercise-data)])
-    (println (check-distance exercise-data))))
+    (println (check-distance exercise-data))
+    (println (check-similarity exercise-data))))
