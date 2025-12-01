@@ -7,5 +7,10 @@
     enable = true;
     package = pkgs.ruby_3_3;
   };
-  languages.racket = { enable = true; };
+  languages.racket = {
+    enable = false; # Disable for now
+  };
+  languages.rust = {
+    enable = true;
+  };
 }
