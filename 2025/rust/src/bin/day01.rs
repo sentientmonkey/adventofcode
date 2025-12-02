@@ -29,7 +29,7 @@ fn move_dial(command: &str, start: i32) -> (i32, i32) {
     };
     let zeros = match direction {
         "L" => {
-            if movement < 0 {
+            if movement <= 0 && start != 0 {
                 1
             } else {
                 0
@@ -120,6 +120,9 @@ L82";
         test_moves_past_zero("L68", 50, 1);
         test_moves_past_zero("L30", 82, 0);
         test_moves_past_zero("R48", 52, 1);
+        test_moves_past_zero("L5", 0, 0);
+        test_moves_past_zero("R60", 95, 1);
+        test_moves_past_zero("L55", 55, 1);
     }
 
     #[test]
