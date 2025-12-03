@@ -1,20 +1,5 @@
-use std::{
-    env,
-    fs::File,
-    io::{self, Read},
-};
-
-fn read_file_or_stdin(path: &str) -> io::Result<String> {
-    let mut reader: Box<dyn Read> = if path == "-" {
-        Box::new(io::stdin())
-    } else {
-        Box::new(File::open(path)?)
-    };
-
-    let mut contents = String::new();
-    reader.read_to_string(&mut contents)?;
-    Ok(contents)
-}
+use adventofcode::read_file_or_stdin;
+use std::{env, io};
 
 fn move_dial(command: &str, start: i32) -> (i32, i32) {
     let (direction, amount_str) = command.split_at(1);
