@@ -26,8 +26,24 @@ fn repeats(id: u64) -> bool {
     first.chars().zip(second.chars()).all(|(a, b)| a == b)
 }
 
+fn repeatsn(id: u64) -> bool {
+    let s = id.to_string();
+    (1..(s.len())).any(|n| {
+        s.chars()
+            .collect::<Vec<char>>()
+            .chunks(n)
+            .collect::<Vec<&[char]>>()
+            .windows(2)
+            .all(|a| a[0] == a[1])
+    })
+}
+
 fn get_repeating(start: u64, end: u64) -> Vec<u64> {
     (start..end + 1).filter(|id| repeats(*id)).collect()
+}
+
+fn get_repeatingn(start: u64, end: u64) -> Vec<u64> {
+    (start..end + 1).filter(|id| repeatsn(*id)).collect()
 }
 
 fn sum_of_repeating(ids: &str) -> u64 {
@@ -41,11 +57,24 @@ fn sum_of_repeating(ids: &str) -> u64 {
         .sum()
 }
 
+fn sum_of_repeatingn(ids: &str) -> u64 {
+    ids.trim()
+        .split(",")
+        .map(|r| {
+            let parts: Vec<u64> = r.splitn(2, "-").map(|s| s.parse().unwrap()).collect();
+            get_repeatingn(parts[0], parts[1])
+        })
+        .flatten()
+        .sum()
+}
+
 fn main() -> io::Result<()> {
     let input = env::args().nth(1).unwrap_or_else(|| "-".to_string());
     let contents = read_file_or_stdin(&input)?;
     let sum = sum_of_repeating(&contents);
     println!("{}", sum);
+    let sumn = sum_of_repeatingn(&contents);
+    println!("{}", sumn);
     Ok(())
 }
 
@@ -74,5 +103,23 @@ mod tests {
     #[test]
     fn it_returns_sum_of_repeating() {
         assert_eq!(sum_of_repeating(SAMPLE_INPUT), 1227775554);
+    }
+
+    #[test]
+    fn it_repeatsn() {
+        assert!(repeatsn(55));
+        assert!(repeatsn(123123123));
+        assert!(repeatsn(12121212121212));
+        assert!(repeatsn(1111111));
+        assert!(!repeatsn(1234));
+    }
+
+    #[test]
+    fn it_gets_repeatingn() {
+        assert_eq!(get_repeatingn(11, 22), vec![11, 22]);
+        assert_eq!(get_repeatingn(99, 115), vec![99, 111]);
+        assert_eq!(get_repeatingn(998, 1012), vec![999, 1010]);
+        assert_eq!(get_repeatingn(1188511880, 1188511890), vec![1188511885]);
+        assert_eq!(get_repeatingn(222220, 222224), vec![222222]);
     }
 }
