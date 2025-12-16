@@ -2,7 +2,7 @@ use adventofcode::read_file_or_stdin;
 
 use std::collections::HashSet;
 use std::ops::RangeInclusive;
-use std::{env, io};
+use std::{cmp, env, fmt, io};
 
 #[derive(Debug, PartialEq)]
 struct Database {
@@ -41,23 +41,49 @@ impl Database {
             .collect()
     }
 
-    pub fn find_all_fresh_ingredients(&self) -> HashSet<i64> {
-        HashSet::from_iter(
-            self.fresh
-                .iter()
-                .flat_map(|s| s.clone().into_iter())
-                .collect::<Vec<i64>>(),
-        )
+    pub fn find_all_fresh_ingredients_count(&self) -> i64 {
+        self.fresh.iter().map(|r| r.end() + 1 - r.start()).sum()
+    }
+
+    pub fn reduce_ranges(&mut self) {
+        self.fresh
+            .sort_by_key(|i| (i.start().clone(), i.end().clone()));
+
+        self.fresh = self.fresh.iter().fold(Vec::new(), |mut acc, c| {
+            if acc.len() == 0 {
+                acc.push(c.clone());
+            } else if (acc.last().unwrap().end() + 1) >= *c.start() {
+                let left = acc.pop().unwrap();
+                acc.push(RangeInclusive::new(
+                    left.start().clone(),
+                    cmp::max(left.end().clone(), c.end().clone()),
+                ));
+            } else {
+                acc.push(c.clone());
+            }
+            acc
+        });
+    }
+}
+
+impl fmt::Display for Database {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "fresh:")?;
+        for row in self.fresh.iter() {
+            writeln!(f, "{}-{}", row.start(), row.end())?;
+        }
+        Ok(())
     }
 }
 
 fn main() -> io::Result<()> {
     let input = env::args().nth(1).unwrap_or_else(|| "-".to_string());
     let contents = read_file_or_stdin(&input)?;
-    let db = Database::from_input(&contents);
+    let mut db = Database::from_input(&contents);
     let count = db.fresh_ingredients().len();
     println!("{}", count);
-    let count = db.find_all_fresh_ingredients().len();
+    db.reduce_ranges();
+    let count = db.find_all_fresh_ingredients_count();
     println!("{}", count);
     Ok(())
 }
@@ -94,11 +120,44 @@ mod tests {
     }
 
     #[test]
-    fn it_should_find_all_fresh() {
-        let db = Database::from_input(SAMPLE_INPUT);
-        assert_eq!(
-            HashSet::from([3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
-            db.find_all_fresh_ingredients()
+    fn it_should_reduce_ranges() {
+        let mut db = Database::from_input(SAMPLE_INPUT);
+        db.reduce_ranges();
+        assert_eq!(db.fresh, vec![(3..=5), (10..=20)])
+    }
+
+    #[test]
+    fn it_should_reduce_ranges_with_edge_case() {
+        let mut db = Database::from_input(
+            "3-5
+10-14
+16-20
+12-18
+9-21
+
+0",
         );
+        db.reduce_ranges();
+        assert_eq!(db.fresh, vec![(3..=5), (9..=21)]);
+        assert_eq!(db.find_all_fresh_ingredients_count(), 16);
+    }
+
+    #[test]
+    fn it_should_reduce_ranges_with_overlaps() {
+        let mut db = Database::from_input(
+            "23029611009699-23029611009699
+23029611009700-27519859263588
+
+0",
+        );
+        db.reduce_ranges();
+        assert_eq!(db.fresh, vec![(23029611009699..=27519859263588)])
+    }
+
+    #[test]
+    fn it_should_find_all_ingredients_count() {
+        let mut db = Database::from_input(SAMPLE_INPUT);
+        db.reduce_ranges();
+        assert_eq!(db.find_all_fresh_ingredients_count(), 14);
     }
 }
