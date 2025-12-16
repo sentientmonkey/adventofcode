@@ -1,5 +1,6 @@
 use adventofcode::read_file_or_stdin;
 
+use std::collections::HashSet;
 use std::ops::RangeInclusive;
 use std::{env, io};
 
@@ -39,14 +40,25 @@ impl Database {
             .filter(|i| self.fresh.clone().into_iter().any(|r| r.contains(i)))
             .collect()
     }
+
+    pub fn find_all_fresh_ingredients(&self) -> HashSet<i64> {
+        HashSet::from_iter(
+            self.fresh
+                .iter()
+                .flat_map(|s| s.clone().into_iter())
+                .collect::<Vec<i64>>(),
+        )
+    }
 }
 
 fn main() -> io::Result<()> {
     let input = env::args().nth(1).unwrap_or_else(|| "-".to_string());
     let contents = read_file_or_stdin(&input)?;
     let db = Database::from_input(&contents);
-    let fresh_count = db.fresh_ingredients().len();
-    println!("{}", fresh_count);
+    let count = db.fresh_ingredients().len();
+    println!("{}", count);
+    let count = db.find_all_fresh_ingredients().len();
+    println!("{}", count);
     Ok(())
 }
 
@@ -79,5 +91,14 @@ mod tests {
     fn it_should_find_fresh() {
         let db = Database::from_input(SAMPLE_INPUT);
         assert_eq!(vec![5, 11, 17], db.fresh_ingredients());
+    }
+
+    #[test]
+    fn it_should_find_all_fresh() {
+        let db = Database::from_input(SAMPLE_INPUT);
+        assert_eq!(
+            HashSet::from([3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
+            db.find_all_fresh_ingredients()
+        );
     }
 }
