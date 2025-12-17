@@ -1,7 +1,8 @@
 use adventofcode::read_file_or_stdin;
 
+use std::cmp::{max, min};
 use std::ops::RangeInclusive;
-use std::{cmp, env, fmt, io};
+use std::{env, fmt, io};
 
 trait RangeOverlap {
     fn overlaps(&self, other: &Self) -> bool;
@@ -10,6 +11,18 @@ trait RangeOverlap {
 impl RangeOverlap for RangeInclusive<i64> {
     fn overlaps(&self, other: &Self) -> bool {
         (self.start() <= other.end()) & (other.start() <= self.end())
+    }
+}
+
+trait RangeMerge {
+    fn merge(&self, other: &Self) -> Self;
+}
+
+impl RangeMerge for RangeInclusive<i64> {
+    fn merge(&self, other: &Self) -> Self {
+        let min_start = min(self.start().clone(), other.start().clone());
+        let max_end = max(self.end().clone(), other.end().clone());
+        min_start..=max_end
     }
 }
 
@@ -59,14 +72,13 @@ impl Database {
             .sort_by_key(|i| (i.start().clone(), i.end().clone()));
 
         self.fresh = self.fresh.iter().fold(Vec::new(), |mut acc, c| {
-            if acc.len() == 0 {
-                acc.push(c.clone());
-            } else if acc.last().unwrap().overlaps(&c) {
-                let left = acc.pop().unwrap();
-                let max_end = cmp::max(left.end().clone(), c.end().clone());
-                acc.push(left.start().clone()..=max_end);
-            } else {
-                acc.push(c.clone());
+            match acc.last_mut() {
+                Some(left) if left.overlaps(&c) => {
+                    *left = left.merge(&c);
+                }
+                _ => {
+                    acc.push(c.clone());
+                }
             }
             acc
         });
