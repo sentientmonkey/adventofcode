@@ -1,12 +1,21 @@
 use adventofcode::read_file_or_stdin;
 
-use std::collections::HashSet;
 use std::ops::RangeInclusive;
 use std::{cmp, env, fmt, io};
 
+trait RangeOverlap {
+    fn overlaps(&self, other: &Self) -> bool;
+}
+
+impl RangeOverlap for RangeInclusive<i64> {
+    fn overlaps(&self, other: &Self) -> bool {
+        (self.start() <= other.end()) & (other.start() <= self.end())
+    }
+}
+
 #[derive(Debug, PartialEq)]
 struct Database {
-    pub fresh: Vec<std::ops::RangeInclusive<i64>>,
+    pub fresh: Vec<RangeInclusive<i64>>,
     pub inventory: Vec<i64>,
 }
 
@@ -15,7 +24,7 @@ fn line_to_range(s: &str) -> RangeInclusive<i64> {
         .split("-")
         .map(|n| n.parse::<i64>().unwrap())
         .collect::<Vec<i64>>();
-    RangeInclusive::new(numbers[0], numbers[1])
+    numbers[0]..=numbers[1]
 }
 
 fn line_to_number(s: &str) -> i64 {
@@ -52,12 +61,10 @@ impl Database {
         self.fresh = self.fresh.iter().fold(Vec::new(), |mut acc, c| {
             if acc.len() == 0 {
                 acc.push(c.clone());
-            } else if (acc.last().unwrap().end() + 1) >= *c.start() {
+            } else if acc.last().unwrap().overlaps(&c) {
                 let left = acc.pop().unwrap();
-                acc.push(RangeInclusive::new(
-                    left.start().clone(),
-                    cmp::max(left.end().clone(), c.end().clone()),
-                ));
+                let max_end = cmp::max(left.end().clone(), c.end().clone());
+                acc.push(left.start().clone()..=max_end);
             } else {
                 acc.push(c.clone());
             }
@@ -143,21 +150,17 @@ mod tests {
     }
 
     #[test]
-    fn it_should_reduce_ranges_with_overlaps() {
-        let mut db = Database::from_input(
-            "23029611009699-23029611009699
-23029611009700-27519859263588
-
-0",
-        );
-        db.reduce_ranges();
-        assert_eq!(db.fresh, vec![(23029611009699..=27519859263588)])
-    }
-
-    #[test]
     fn it_should_find_all_ingredients_count() {
         let mut db = Database::from_input(SAMPLE_INPUT);
         db.reduce_ranges();
         assert_eq!(db.find_all_fresh_ingredients_count(), 14);
+    }
+
+    #[test]
+    fn it_should_impl_range_overlap() {
+        assert_eq!((3..=5).overlaps(&(6..=7)), false);
+        assert_eq!((3..=5).overlaps(&(5..=7)), true);
+        assert_eq!((5..=7).overlaps(&(3..=5)), true);
+        assert_eq!((6..=7).overlaps(&(3..=5)), false);
     }
 }
