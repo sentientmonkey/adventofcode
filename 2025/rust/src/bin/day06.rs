@@ -27,9 +27,36 @@ impl FromStr for Value {
     }
 }
 
+#[derive(Debug, PartialEq)]
+struct Stack {
+    pub values: Vec<Value>,
+}
+
+impl Stack {
+    pub fn new() -> Self {
+        Stack { values: Vec::new() }
+    }
+
+    fn eval(self: &Stack) -> Result<i64, &str> {
+        let mut stack = self.values.clone();
+        let op = read_op(stack.pop())?;
+        let val = read_num(stack.pop())?;
+
+        let result = stack.iter().fold(val, |mut acc, val| {
+            let n = read_num(Some(val.clone())).expect("num");
+            match op {
+                Op::Multiply => acc *= n,
+                Op::Add => acc += n,
+            };
+            acc
+        });
+        Ok(result)
+    }
+}
+
 #[derive(Debug)]
 struct Calculator {
-    pub stacks: Vec<Vec<Value>>,
+    pub stacks: Vec<Stack>,
 }
 
 fn read_op(val: Option<Value>) -> Result<Op, &'static str> {
@@ -46,29 +73,13 @@ fn read_num(val: Option<Value>) -> Result<i64, &'static str> {
     }
 }
 
-fn eval(s: &Vec<Value>) -> Result<i64, &str> {
-    let mut stack = s.clone();
-    let op = read_op(stack.pop())?;
-    let val = read_num(stack.pop())?;
-
-    let result = stack.iter().fold(val, |mut acc, val| {
-        let n = read_num(Some(val.clone())).expect("num");
-        match op {
-            Op::Multiply => acc *= n,
-            Op::Add => acc += n,
-        };
-        acc
-    });
-    Ok(result)
-}
-
 impl Calculator {
     fn new() -> Self {
         Calculator { stacks: Vec::new() }
     }
 
     fn total(&self) -> Result<i64, &str> {
-        self.stacks.iter().map(|s| eval(&s)).sum()
+        self.stacks.iter().map(|s| s.eval()).sum()
     }
 }
 
@@ -81,9 +92,11 @@ impl FromStr for Calculator {
         for (i, line) in s.lines().enumerate() {
             for (j, tok) in line.split_whitespace().enumerate() {
                 if i == 0 {
-                    calculators.stacks.push(Vec::new());
+                    calculators.stacks.push(Stack::new());
                 }
-                calculators.stacks[j].push(tok.parse::<Value>().unwrap());
+                calculators.stacks[j]
+                    .values
+                    .push(tok.parse::<Value>().unwrap());
             }
         }
 
@@ -111,23 +124,23 @@ mod tests {
     #[test]
     fn it_should_parse_into_calculators() {
         let calc = SAMPLE_INPUT.parse::<Calculator>().expect("Failed to parse");
-        let first: Vec<Value> = vec![
+        let first = vec![
             Value::Num(123),
             Value::Num(45),
             Value::Num(6),
             Value::Op(Op::Multiply),
         ];
-        assert_eq!(calc.stacks[0], first);
+        assert_eq!(calc.stacks[0].values, first);
     }
 
     #[test]
     fn it_should_eval_stack() {
         let calc = SAMPLE_INPUT.parse::<Calculator>().expect("Failed to parse");
 
-        assert_eq!(eval(&calc.stacks[0]), Ok(33210));
-        assert_eq!(eval(&calc.stacks[1]), Ok(490));
-        assert_eq!(eval(&calc.stacks[2]), Ok(4243455));
-        assert_eq!(eval(&calc.stacks[3]), Ok(401));
+        assert_eq!(calc.stacks[0].eval(), Ok(33210));
+        assert_eq!(calc.stacks[1].eval(), Ok(490));
+        assert_eq!(calc.stacks[2].eval(), Ok(4243455));
+        assert_eq!(calc.stacks[3].eval(), Ok(401));
     }
 
     #[test]
