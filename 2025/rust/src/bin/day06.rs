@@ -28,7 +28,7 @@ impl FromStr for Value {
 }
 
 #[derive(Debug)]
-struct Calculators {
+struct Calculator {
     pub stacks: Vec<Vec<Value>>,
 }
 
@@ -62,9 +62,9 @@ fn eval(s: &Vec<Value>) -> Result<i64, &str> {
     Ok(result)
 }
 
-impl Calculators {
+impl Calculator {
     fn new() -> Self {
-        Calculators { stacks: Vec::new() }
+        Calculator { stacks: Vec::new() }
     }
 
     fn total(&self) -> Result<i64, &str> {
@@ -72,11 +72,11 @@ impl Calculators {
     }
 }
 
-impl FromStr for Calculators {
+impl FromStr for Calculator {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, String> {
-        let mut calculators = Calculators::new();
+        let mut calculators = Calculator::new();
 
         for (i, line) in s.lines().enumerate() {
             for (j, tok) in line.split_whitespace().enumerate() {
@@ -94,7 +94,7 @@ impl FromStr for Calculators {
 fn main() -> io::Result<()> {
     let input = env::args().nth(1).unwrap_or_else(|| "-".to_string());
     let contents = read_file_or_stdin(&input)?;
-    let calculator = Calculators::from_str(&contents).expect("To parse input");
+    let calculator = Calculator::from_str(&contents).expect("To parse input");
     let total = calculator.total().expect("To calculate total");
     println!("{}", total);
     Ok(())
@@ -110,9 +110,7 @@ mod tests {
 
     #[test]
     fn it_should_parse_into_calculators() {
-        let calc = SAMPLE_INPUT
-            .parse::<Calculators>()
-            .expect("Failed to parse");
+        let calc = SAMPLE_INPUT.parse::<Calculator>().expect("Failed to parse");
         let first: Vec<Value> = vec![
             Value::Num(123),
             Value::Num(45),
@@ -124,9 +122,7 @@ mod tests {
 
     #[test]
     fn it_should_eval_stack() {
-        let calc = SAMPLE_INPUT
-            .parse::<Calculators>()
-            .expect("Failed to parse");
+        let calc = SAMPLE_INPUT.parse::<Calculator>().expect("Failed to parse");
 
         assert_eq!(eval(&calc.stacks[0]), Ok(33210));
         assert_eq!(eval(&calc.stacks[1]), Ok(490));
@@ -136,9 +132,7 @@ mod tests {
 
     #[test]
     fn it_should_total_stack() {
-        let calc = SAMPLE_INPUT
-            .parse::<Calculators>()
-            .expect("Failed to parse");
+        let calc = SAMPLE_INPUT.parse::<Calculator>().expect("Failed to parse");
 
         assert_eq!(calc.total(), Ok(4277556));
     }
